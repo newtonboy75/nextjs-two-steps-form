@@ -1,101 +1,240 @@
-import Image from "next/image";
+"use client";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useTwoStepsForm } from "./hooks/useTwoStepsForm";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [isChecked, setIsChecked] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const {
+    step,
+    step1Form,
+    step2Form,
+    step1Data,
+    onSubmitStep1,
+    onSubmitStep2,
+    handleBack,
+    getDropdownOptions,
+    setStep1Value,
+    setStep2Value,
+    step1Trigger,
+    step2Trigger,
+    step1Errors,
+    step2Errors,
+    interestValue,
+    isSubmitting,
+  } = useTwoStepsForm();
+
+  const { register: registerStep1, handleSubmit: handleSubmitStep1 } =
+    step1Form; //Step 1
+  const { register: registerStep2, handleSubmit: handleSubmitStep2 } =
+    step2Form; // Step 2
+
+  const handleCheckChanged = (checked: boolean) => {
+    setIsChecked(checked);
+    setStep2Value("termsAccepted", checked, { shouldValidate: true }); // Setting termsAccepted boolean value manually due to shadcn not setting value
+  };
+
+  return (
+    <>
+      <h1 className="mt-10 font-bold text-3xl w-full text-center">
+        Two-Steps Form
+      </h1>
+      <div className="max-w-lg mx-auto py-8 px-8">
+        {step === 1 && (
+          <form
+            onSubmit={handleSubmitStep1(onSubmitStep1)}
+            className="space-y-4"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <div>
+              <label htmlFor="email" className="block text-sm font-bold my-2">
+                Email
+              </label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="Email"
+                {...registerStep1("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+\.\S+$/,
+                    message: "Please enter a valid email",
+                  },
+                })}
+                className="w-full"
+              />
+              {step1Errors.email && (
+                <p className="text-red-600 block text-xs my-2">
+                  {step1Errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-bold my-2"
+              >
+                First Name
+              </label>
+              <Input
+                type="text"
+                id="firstName"
+                placeholder="First Name"
+                {...registerStep1("firstName", {
+                  required: "First name is required",
+                })}
+                className="w-full"
+              />
+              {step1Errors.firstName && (
+                <p className="text-red-600 block text-xs my-2">
+                  {step1Errors.firstName.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-bold my-2"
+              >
+                Last Name
+              </label>
+              <Input
+                type="text"
+                id="lastName"
+                placeholder="Last Name"
+                {...registerStep1("lastName", {
+                  required: "Last name is required",
+                })}
+                className="w-full"
+              />
+              {step1Errors.lastName && (
+                <p className="text-red-600 text-xs my-2">
+                  {step1Errors.lastName.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-bold my-2"
+                htmlFor="interest"
+              >
+                Interest
+              </label>
+              <Select
+                onValueChange={(value) => {
+                  setStep1Value("interest", value);
+                  step1Trigger("interest");
+                }}
+                defaultValue={interestValue}
+                {...registerStep1("interest", {
+                  required: "Please select an interest",
+                })}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Interest" />
+                </SelectTrigger>
+                <SelectContent className="w-full">
+                  <SelectItem value="Cars">Cars</SelectItem>
+                  <SelectItem value="Music">Music</SelectItem>
+                  <SelectItem value="Sport">Sport</SelectItem>
+                </SelectContent>
+              </Select>
+              {step1Errors.interest && (
+                <p className="text-red-600 text-xs my-2">
+                  {step1Errors.interest.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full">
+              Next
+            </Button>
+          </form>
+        )}
+
+        {step === 2 && (
+          <form
+            onSubmit={handleSubmitStep2(onSubmitStep2)}
+            className="space-y-4"
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <div className="flex items-center">
+              <Checkbox
+                {...registerStep2("termsAccepted", {
+                  required: "You must accept terms and conditions",
+                })}
+                checked={isChecked} // Controlled component
+                onCheckedChange={handleCheckChanged}
+              />
+              <label htmlFor="terms" className="ml-2 text-sm font-bold">
+                I accept the terms and conditions
+              </label>
+            </div>
+            {step2Errors.termsAccepted && (
+              <p className="text-red-600 text-xs">
+                {step2Errors.termsAccepted.message}
+              </p>
+            )}
+
+            <div>
+              <label className="block text-sm font-bold mt-8 mb-2">{`Favorite ${step1Data?.interest} Type`}</label>
+              <Select
+                onValueChange={(value) => {
+                  setStep2Value("favoriteInterest", value);
+                  step2Trigger("favoriteInterest");
+                }}
+                defaultValue=""
+                {...registerStep2("favoriteInterest", {
+                  required: `Please Select Favorite ${step1Data?.interest}`,
+                })}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue
+                    placeholder={`Select Favorite ${step1Data?.interest}`}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {getDropdownOptions().map((option, index) => (
+                    <SelectItem key={index} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {step2Errors.favoriteInterest && (
+                <p className="text-red-600 text-xs my-2">
+                  {step2Errors.favoriteInterest.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-between">
+              <Button
+                onClick={handleBack}
+                variant={"secondary"}
+                disabled={isSubmitting}
+              >
+                Back
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Submit
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </>
   );
 }
