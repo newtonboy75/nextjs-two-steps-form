@@ -25,6 +25,7 @@ export default function Home() {
     onSubmitStep2,
     handleBack,
     getDropdownOptions,
+    getDropdownOptionsLabel,
     setStep1Value,
     setStep2Value,
     step1Trigger,
@@ -189,7 +190,7 @@ export default function Home() {
             )}
 
             <div>
-              <label className="block text-sm font-bold mt-8 mb-2">{`Favorite ${step1Data?.interest} Type`}</label>
+              <label className="block text-sm font-bold mt-8 mb-2">{getDropdownOptionsLabel()}</label>
               <Select
                 onValueChange={(value) => {
                   setStep2Value("favoriteInterest", value);

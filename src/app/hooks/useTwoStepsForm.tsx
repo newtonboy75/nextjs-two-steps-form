@@ -5,6 +5,7 @@ import { Step1FormValues, Step2FormValues } from "../types/formTypes";
 export const useTwoStepsForm = () => {
   const [step, setStep] = useState(1);
   const [step1Data, setStep1Data] = useState<Step1FormValues | null>(null);
+  const [optionLabel, setOptionLabel] = useState<string | null>(null)
 
   const step1Form = useForm<Step1FormValues>({ mode: "onChange" }); // Step 1 form
   const step2Form = useForm<Step2FormValues>({ mode: "onChange", defaultValues: { termsAccepted: false } }); // Step 2 form
@@ -25,8 +26,9 @@ export const useTwoStepsForm = () => {
   const interestValue = step1Watch("interest");
 
   const onSubmitStep1: SubmitHandler<Step1FormValues> = (data) => {
-    console.log(data);
+    //console.log(data);
     setStep1Data(data);
+    setOptionLabel(data.interest)
     setStep(2);
   };
 
@@ -52,6 +54,19 @@ export const useTwoStepsForm = () => {
     }
   };
 
+  const getDropdownOptionsLabel = () => {
+    switch (optionLabel) {
+        case "Cars":
+          return "Favorite Car Type";
+        case "Music":
+          return "Favorite Music Genre";
+        case "Sport":
+          return "Favorite Sport";
+        default:
+          return null;
+      }
+  }
+
   return {
     step,
     step1Form,
@@ -68,6 +83,7 @@ export const useTwoStepsForm = () => {
     onSubmitStep2,
     handleBack,
     getDropdownOptions,
+    getDropdownOptionsLabel,
     isSubmitting,
   };
 };
