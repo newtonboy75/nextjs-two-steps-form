@@ -18,7 +18,6 @@ export const useTwoStepsForm = () => {
 
   const {
     setValue: setStep2Value,
-    watch: step2Watch,
     trigger: step2Trigger,
     formState: { errors: step2Errors, isSubmitting },
   } = step2Form;

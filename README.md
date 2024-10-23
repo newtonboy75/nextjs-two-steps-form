@@ -6,6 +6,7 @@ Features:
 Step 1: Collects email, first name, last name, and interest (Cars, Music or Sports).
         - All fields required
         - Email must be valid.
+        
 Step 2: Terms checkbox and dynamic dropdown based on selected interest.
         - Terms must be checked; dropdown options change based on selected interest.
 
